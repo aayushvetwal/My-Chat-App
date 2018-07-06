@@ -6,7 +6,20 @@
 		<title>Chat App</title>
 	</head>
 	<body>
+		Register<br/>
+		<form onsubmit="return register(event);">
+			Email <input id="email" type="text" /> <br/>
+			Password <input id="password" type="password" /> <br/>
+			<button>Register</button><br/>
+		</form>
+		Login<br/>
+		<form onsubmit="return login(event);">
+			Email <input id="lemail" type="text" /> <br/>
+			Password <input id="lpassword" type="password" /> <br/>
+			<button>Login</button><br/>
+		</form>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/chat.js"></script>
+		
 	</body>
 </html>
