@@ -8,62 +8,53 @@ const app = express();
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 
+const userMap = {};
+
 const publicPath = path.join(__dirname, '..', 'public')
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
-
 
 app.get('/', (req, res) => {
 	res.sendFile(path.join(publicPath, 'index.html'));
 });
 
+app.get('/page', (req, res) => {
+	res.sendFile(path.join(publicPath, 'chatPage.html'));
+});
+
 app.post('/register', (req, res) => {
 	const email = req.body.email;
 	const password = req.body.password;
-	firebase.auth()
-		.createUserWithEmailAndPassword(email, password)
-		.then(() => {
-			res.status(200).send('User created!');
-		})
-		.catch((e) => {
-			
-		});
+	
 });
 
 app.post('/login', (req, res) => {
 	const email = req.body.email;
 	const password = req.body.password;
 	
-	firebase.auth()
-		.signInWithEmailAndPassword(email, password)
-		.then(() => {
-			res.status(200).send('User created!');
-		})
-		.catch((e) => {
-			
-		});
+	
 });
 
 io.on('connection', (socket) => {
 	socket.emit('test', 'Server on port 3000');	
 	
 	//console.log(socket);
-	console.log(socket.id);
+	//console.log(socket.id);
 	
-	socket.on('reply', (data) => {
-		console.log(data);
+	socket.on('userInfo', (data) => {
+		const userInfo = JSON.parse(data);
+		if(!userMap[userInfo.email]){
+			userMap[userInfo.email] = socket.id;
+		}
+		console.log(userMap);
+	});
+	
+	socket.on('message', (data) => {
+		console.log('sent');
+		io.to(userMap[data.email]).emit('message', getEmail() + ' ' + data.message);
 	});
 });
 
-firebase.auth().onAuthStateChanged((user) => {
-	if(user){
-		console.log('log-in');
-		console.log(user);
-	} else {
-		//store.dispatch(logout());
-		
-		//console.log('log-out');
-	}
-});
+const getEmail = (socketId) => userMap.filter((element) => element === socketId).keys()[0];
 
 server.listen(3000);
