@@ -43,18 +43,18 @@ io.on('connection', (socket) => {
 	
 	socket.on('userInfo', (data) => {
 		const userInfo = JSON.parse(data);
-		if(!userMap[userInfo.email]){
-			userMap[userInfo.email] = socket.id;
-		}
+		
+		userMap[userInfo.email] = socket.id;
+		
 		console.log(userMap);
 	});
 	
 	socket.on('message', (data) => {
-		console.log('sent');
-		io.to(userMap[data.email]).emit('message', getEmail() + ' ' + data.message);
+		console.log('sent from', getEmail(socket.id));
+		io.to(userMap[data.email]).emit('message', '<b>' + getEmail(socket.id) + ': </b>' + data.message);
 	});
 });
 
-const getEmail = (socketId) => userMap.filter((element) => element === socketId).keys()[0];
+const getEmail = (socketId) => Object.keys(userMap).find((key) => userMap[key] === socketId);
 
 server.listen(3000);

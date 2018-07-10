@@ -73,10 +73,12 @@ const send = () => {
 	const message = document.getElementById('message').value;
 	const email = document.getElementById('to').value;
 	const data = {message, email};
-	console.log(socket);
-	if(!socket){
+	
+	if(socket){
 		socket.emit('message', data);
 	}
+	
+	document.getElementById('messages').innerHTML += '<b>You: </b>' + message + '<br/>'; 
 };
 
 firebase.auth().onAuthStateChanged((user) => {
